@@ -23,12 +23,12 @@ motor MotorLB = motor(PORT19, ratio18_1, true); // reversed
 motor MotorRF = motor(PORT11, ratio18_1, false); // forward direction
 motor MotorRB = motor(PORT12, ratio18_1, false); // forward direction
 motor Shooter = motor(PORT4, ratio36_1, true);
-motor LeftWing = motor(PORT6, ratio18_1, false);
-motor RightWing = motor(PORT3, ratio18_1, false);
+//motor LeftWing = motor(PORT6, ratio18_1, false);
+//motor RightWing = motor(PORT3, ratio18_1, false);
 motor LIntake = motor(PORT1, ratio18_1, false);
 motor RIntake = motor(PORT2, ratio18_1, false);
 motor Arm = motor(PORT8, ratio36_1, false);
-motor Lift = motor(PORT1, ratio36_1, false);
+motor Lift = motor(PORT3, ratio36_1, false);
 inertial DaInertial = inertial(PORT10);
 limit catalimit = limit(Brain.ThreeWirePort.A);
 limit liftlimit = limit(Brain.ThreeWirePort.H);
@@ -60,6 +60,7 @@ bool isArmOpen(){
   return false;
 }
 
+/*
 bool isRightWOpen(){
   int encoderValue = RightWing.position(deg);
   if(encoderValue < -40){
@@ -75,6 +76,8 @@ bool isLeftWOpen(){
   }
   return false;
 }
+
+*/
 
 bool LiftInRange(void){
   if(Lift.position(deg) > 740){
@@ -336,8 +339,6 @@ void auto_own(void){
 }
 
 
-
-
 void auto_opposite(void){
 
 
@@ -363,7 +364,6 @@ void autonomous(void) {
   // ..........................................................................
   // Insert autonomous user code here.
   // ..........................................................................
-  vex::task MyTask(ShowMeInfo);
   //auto_opposite();
   //auto_own();
   //skills();
@@ -381,19 +381,13 @@ void autonomous(void) {
 /*---------------------------------------------------------------------------*/
 
 void usercontrol(void) {
-  Brain.Screen.clearScreen();
-
   wait(15, msec);
   // User control code here, inside the loop
   while (1) {
- 
-       
     RightMotors.setVelocity((Controller1.Axis3.position() - Controller1.Axis1.position()), percent);
     LeftMotors.setVelocity((Controller1.Axis1.position() + Controller1.Axis3.position()), percent);
     RightMotors.spin(forward);
     LeftMotors.spin(forward);
-    
-
     wait(20, msec); // Sleep the task for a short amount of time to
                     // prevent wasted resources.
   }
@@ -404,7 +398,7 @@ void usercontrol(void) {
 //
 int main() {
   Lift.resetPosition();
-  catastop();
+  //catastop();
   Controller1.ButtonL1.pressed(event_Catapult);
   Controller1.ButtonL2.pressed(event_Wings);
   Controller1.ButtonR2.pressed(event_Outake);
@@ -420,6 +414,8 @@ int main() {
 
   ShootButtonPressed = false;
   WingButtonPressed = false;
+
+  vex::task MyTask(ShowMeInfo);
 
 
   // Run the pre-autonomous function.
