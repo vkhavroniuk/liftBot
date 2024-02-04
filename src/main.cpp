@@ -515,3 +515,6 @@ int main() {
 
 // move button hook from usercontrol to main 
 // change velocity control for if else if else due to speed fluctuation
+// change PID motor start to single motor (test in robotics lab)
+// hold positions when shoot
+// intake code optimize
