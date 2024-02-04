@@ -30,8 +30,13 @@ motor RIntake = motor(PORT2, ratio18_1, false);
 motor Arm = motor(PORT8, ratio36_1, false);
 motor Lift = motor(PORT3, ratio36_1, false);
 inertial DaInertial = inertial(PORT10);
-limit catalimit = limit(Brain.ThreeWirePort.A);
+
+limit catalimit = limit(Brain.ThreeWirePort.D);
 limit liftlimit = limit(Brain.ThreeWirePort.H);
+digital_out leftWing = digital_out(Brain.ThreeWirePort.A);
+digital_out rightWing = digital_out(Brain.ThreeWirePort.B);
+digital_out ratchet = digital_out(Brain.ThreeWirePort.C);
+
 motor_group LeftMotors = motor_group(MotorLF, MotorLB);
 motor_group RightMotors = motor_group(MotorRF, MotorRB);
 
@@ -60,28 +65,28 @@ bool isArmOpen(){
   return false;
 }
 
-/*
+
 bool isRightWOpen(){
-  int encoderValue = RightWing.position(deg);
-  if(encoderValue < -40){
+  if(rightWing.value()){
     return true;
   }
   return false;
 }
 
 bool isLeftWOpen(){
-  int encoderValue = LeftWing.position(deg);
-  if(encoderValue > 40){
+  if(leftWing.value()){
     return true;
   }
   return false;
 }
 
-*/
+
 
 bool LiftInRange(void){
-  if(Lift.position(deg) > 740){
+  if(Lift.position(deg) > 830){
     return false;
+    //260 degrees for elevation
+    //320 degrees for cool shooting
   }
   return true;
 }
@@ -99,7 +104,22 @@ void push(int time){
 
 
 void event_Wings(void){
-
+  if(!isLeftWOpen())
+  {
+    leftWing.set(true);
+  }
+  else
+  {
+    leftWing.set(false);
+  }
+  if(!isRightWOpen())
+  {
+    rightWing.set(true);
+  }
+  else
+  {
+    rightWing.set(false);
+  }
 }
 
 void event_RightWing(void){
@@ -107,19 +127,20 @@ void event_RightWing(void){
 }
 
 
-void catastop(void){
-  Shooter.setVelocity(30.0, percent);
+int catastop(){
+  Shooter.setVelocity(20.0, percent);
   Shooter.spin(reverse);
   waitUntil(catalimit.value());
   Shooter.stop(hold);
+  return 0;
 }
 
 void event_liftdown(void){
   Lift.setVelocity(50.0, percent);
   Lift.spin(reverse);
-  waitUntil(liftlimit.value());
-  Lift.stop(hold);
-  Lift.resetPosition();
+  //waitUntil(liftlimit.value());
+  //Lift.stop(hold);
+  //Lift.resetPosition();
 }
 
 void event_liftup(void){
@@ -132,11 +153,13 @@ void event_liftup(void){
 void event_Catapult(void){
       if (!ShootButtonPressed) {
         Shooter.setVelocity(80.0, percent);
+        Lift.spinTo(320,deg,false);
         Shooter.spin(reverse);
         ShootButtonPressed = true;
       }
       else {
         catastop();
+        event_liftdown();
         ShootButtonPressed = false;
       };
 };
@@ -311,6 +334,22 @@ void pre_auton(void) {
   Brain.Screen.clearScreen();
 }
 
+
+int limit_switch_lift() {
+  while (true) {
+
+  while (true) {
+    if (liftlimit.value()) {
+      Lift.stop(hold);
+      Lift.resetPosition();
+      break;
+    }
+  }
+      waitUntil(Lift.position(deg) > 30);
+  }
+  return 0;
+}
+
 int ShowMeInfo(){
   while (true) {
     Brain.Screen.setCursor(4,1);
@@ -328,6 +367,7 @@ int ShowMeInfo(){
     Brain.Screen.setCursor(10,1);
     Brain.Screen.print(RightMotors.position(rotationUnits::deg));
     Brain.Screen.setCursor(11,1);
+    Brain.Screen.print(Lift.position(rotationUnits::deg));
 
     wait(25, msec);
   } 
@@ -397,8 +437,11 @@ void usercontrol(void) {
 // Main will set up the competition functions and callbacks.
 //
 int main() {
+  ratchet.set(0);
   Lift.resetPosition();
-  //catastop();
+  task CataS(catastop);
+  task LiftStopTask(limit_switch_lift);
+
   Controller1.ButtonL1.pressed(event_Catapult);
   Controller1.ButtonL2.pressed(event_Wings);
   Controller1.ButtonR2.pressed(event_Outake);
