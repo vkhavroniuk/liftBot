@@ -23,8 +23,7 @@ motor MotorLB = motor(PORT19, ratio18_1, true); // reversed
 motor MotorRF = motor(PORT11, ratio18_1, false); // forward direction
 motor MotorRB = motor(PORT12, ratio18_1, false); // forward direction
 motor Shooter = motor(PORT4, ratio36_1, true);
-//motor LeftWing = motor(PORT6, ratio18_1, false);
-//motor RightWing = motor(PORT3, ratio18_1, false);
+
 motor LIntake = motor(PORT1, ratio18_1, false);
 motor RIntake = motor(PORT2, ratio18_1, false);
 motor Arm = motor(PORT8, ratio36_1, false);
@@ -75,13 +74,13 @@ bool isRightWOpen(){
   return false;
 }
 
+
 bool isLeftWOpen(){
   if(leftWing.value()){
     return true;
   }
   return false;
 }
-
 
 
 bool LiftInRange(void){
@@ -125,7 +124,14 @@ void event_Wings(void){
 }
 
 void event_RightWing(void){
-
+  if(!isRightWOpen())
+  {
+    rightWing.set(true);
+  }
+  else
+  {
+    rightWing.set(false);
+  }
 }
 
 void elevate(void){
@@ -157,9 +163,6 @@ void event_liftdown(void){
   Lift.setVelocity(50.0, percent);
   Lift.spin(reverse);
   }
-  //waitUntil(liftlimit.value());
-  //Lift.stop(hold);
-  //Lift.resetPosition();
 }
 
 void event_liftup(void){
@@ -364,7 +367,7 @@ int limit_switch_lift() {
       break;
     }
   }
-      waitUntil(Lift.position(deg) > 30);
+      waitUntil(Lift.position(deg) > 9);
   }
   return 0;
 }
