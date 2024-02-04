@@ -45,6 +45,8 @@ bool ShootButtonPressed = false;
 bool WingButtonPressed = false;
 bool ArmButtonPressed = false;
 bool RWingButtonPressed = false;
+bool RTE = false;
+float velocity_control = 1;
 PID drivePID;
 PID turnPID;
 PID straightPID;
@@ -126,6 +128,21 @@ void event_RightWing(void){
 
 }
 
+void elevate(void){
+  if(!RTE){
+    ratchet.set(0);
+    Lift.setBrake(hold);
+    Lift.spinTo(825,deg,false);
+    RTE = true;
+  }
+  else if(RTE){
+    ratchet.set(1);
+    Lift.setBrake(hold);
+    Lift.spinTo(240,deg,true);
+    RTE = false;
+  }
+}
+
 
 int catastop(){
   Shooter.setVelocity(20.0, percent);
@@ -136,8 +153,10 @@ int catastop(){
 }
 
 void event_liftdown(void){
+  if (Lift.position(deg) > 8) {
   Lift.setVelocity(50.0, percent);
   Lift.spin(reverse);
+  }
   //waitUntil(liftlimit.value());
   //Lift.stop(hold);
   //Lift.resetPosition();
@@ -350,6 +369,22 @@ int limit_switch_lift() {
   return 0;
 }
 
+int velocity_control_function(){
+  while(true){
+    velocity_control = 1;
+    if(Lift.position(deg) > 300)
+    {
+      velocity_control = .6;
+    }
+    if(Lift.position(deg) > 700)
+    {
+      velocity_control = .4;
+    }
+    wait(500, msec);
+  }
+  return 0;
+}
+
 int ShowMeInfo(){
   while (true) {
     Brain.Screen.setCursor(4,1);
@@ -423,9 +458,11 @@ void autonomous(void) {
 void usercontrol(void) {
   wait(15, msec);
   // User control code here, inside the loop
+  Controller1.ButtonX.pressed(elevate);
+  task VelocityController(velocity_control_function);
   while (1) {
-    RightMotors.setVelocity((Controller1.Axis3.position() - Controller1.Axis1.position()), percent);
-    LeftMotors.setVelocity((Controller1.Axis1.position() + Controller1.Axis3.position()), percent);
+    RightMotors.setVelocity((Controller1.Axis3.position() - Controller1.Axis1.position()) * velocity_control, percent);
+    LeftMotors.setVelocity((Controller1.Axis1.position() + Controller1.Axis3.position()) * velocity_control, percent);
     RightMotors.spin(forward);
     LeftMotors.spin(forward);
     wait(20, msec); // Sleep the task for a short amount of time to
