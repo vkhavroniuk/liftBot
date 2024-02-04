@@ -399,7 +399,7 @@ int ShowMeInfo(){
     Brain.Screen.setCursor(7,1);
     Brain.Screen.print(DaInertial.rotation(degrees)); 
     Brain.Screen.setCursor(8,1);
-    Brain.Screen.print(" Motors Left/Right/Arm");
+    Brain.Screen.print(" Motors Left/Right/Lift");
     Brain.Screen.setCursor(9,1);
     Brain.Screen.print(LeftMotors.position(rotationUnits::deg)); 
     Brain.Screen.setCursor(10,1);
@@ -512,3 +512,6 @@ int main() {
     wait(100, msec);
   }
 }
+
+// move button hook from usercontrol to main 
+// change velocity control for if else if else due to speed fluctuation
