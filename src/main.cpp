@@ -175,35 +175,54 @@ void event_liftup(void){
 void event_Catapult(void){
       if (!ShootButtonPressed) {
         Shooter.setVelocity(80.0, percent);
+        MotorLB.setBrake(hold);
+        MotorLF.setBrake(hold);
+        MotorRF.setBrake(hold);
+        MotorRB.setBrake(hold);
         Lift.spinTo(320,deg,false);
         Shooter.spin(reverse);
         ShootButtonPressed = true;
       }
       else {
         catastop();
+        MotorLB.setBrake(coast);
+        MotorLF.setBrake(coast);
+        MotorRF.setBrake(coast);
+        MotorRB.setBrake(coast);
         event_liftdown();
-        ShootButtonPressed = false;
+        ShootButtonPressed = false;       
       };
 };
 
-void event_Intake(void){
-  LIntake.setVelocity(100.0, percent);
-  RIntake.setVelocity(100.0, percent);
-  LIntake.spin(forward);
-  RIntake.spin(reverse);
-  waitUntil((!Controller1.ButtonR1.pressing()));
+void outake_off(void){
   LIntake.stop();
   RIntake.stop();
 }
 
-void event_Outake(void){
-  LIntake.setVelocity(100.0, percent);
-  RIntake.setVelocity(100.0, percent);
+void outake_on(void){
+  LIntake.setVelocity(100, pct);
+  RIntake.setVelocity(100, pct);
   LIntake.spin(reverse);
   RIntake.spin(forward);
+}
+
+void intake_on(void){
+  LIntake.setVelocity(100, pct);
+  RIntake.setVelocity(100, pct);
+  LIntake.spin(forward);
+  RIntake.spin(reverse);
+}
+
+void event_Intake(void){
+  intake_on();
+  waitUntil((!Controller1.ButtonR1.pressing()));
+  outake_off();
+}
+
+void event_Outake(void){
+  outake_on();
   waitUntil((!Controller1.ButtonR2.pressing()));
-  LIntake.stop();
-  RIntake.stop();
+  outake_off();
 }
 
 void event_Arm(void){
@@ -313,24 +332,7 @@ void drive_backward(int distanceToDrive, float VelocityMin=2, float VelocityMax=
   resetPID(straightPID);
 }
 
-void outake_off(void){
-  LIntake.stop();
-  RIntake.stop();
-}
 
-void outake_on(void){
-  LIntake.setVelocity(100, pct);
-  RIntake.setVelocity(100, pct);
-  LIntake.spin(reverse);
-  RIntake.spin(forward);
-}
-
-void intake_on(void){
-  LIntake.setVelocity(100, pct);
-  RIntake.setVelocity(100, pct);
-  LIntake.spin(forward);
-  RIntake.spin(reverse);
-}
 
 
 
@@ -374,14 +376,17 @@ int limit_switch_lift() {
 
 int velocity_control_function(){
   while(true){
-    velocity_control = 1;
+    
     if(Lift.position(deg) > 300)
     {
       velocity_control = .6;
     }
-    if(Lift.position(deg) > 700)
+    else if(Lift.position(deg) > 700)
     {
       velocity_control = .4;
+    }
+    else{
+      velocity_control = 1;
     }
     wait(500, msec);
   }
@@ -461,7 +466,7 @@ void autonomous(void) {
 void usercontrol(void) {
   wait(15, msec);
   // User control code here, inside the loop
-  Controller1.ButtonX.pressed(elevate);
+  
   task VelocityController(velocity_control_function);
   while (1) {
     RightMotors.setVelocity((Controller1.Axis3.position() - Controller1.Axis1.position()) * velocity_control, percent);
@@ -481,7 +486,7 @@ int main() {
   Lift.resetPosition();
   task CataS(catastop);
   task LiftStopTask(limit_switch_lift);
-
+  Controller1.ButtonX.pressed(elevate);
   Controller1.ButtonL1.pressed(event_Catapult);
   Controller1.ButtonL2.pressed(event_Wings);
   Controller1.ButtonR2.pressed(event_Outake);
@@ -512,9 +517,4 @@ int main() {
     wait(100, msec);
   }
 }
-
-// move button hook from usercontrol to main 
-// change velocity control for if else if else due to speed fluctuation
 // change PID motor start to single motor (test in robotics lab)
-// hold positions when shoot
-// intake code optimize
