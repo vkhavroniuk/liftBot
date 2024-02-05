@@ -136,19 +136,18 @@ void event_RightWing(void){
 
 void elevate(void){
   if(!RTE){
-    ratchet.set(0);
+    ratchet.set(1);
     Lift.setBrake(hold);
     Lift.spinTo(825,deg,false);
     RTE = true;
   }
   else if(RTE){
-    ratchet.set(1);
+    ratchet.set(0);
     Lift.setBrake(hold);
     Lift.spinTo(240,deg,true);
     RTE = false;
   }
 }
-
 
 int catastop(){
   Shooter.setVelocity(20.0, percent);
@@ -361,15 +360,18 @@ void pre_auton(void) {
 
 int limit_switch_lift() {
   while (true) {
+  
+  waitUntil(Lift.position(deg) > 9);
 
   while (true) {
     if (liftlimit.value()) {
       Lift.stop(hold);
+      wait(200, msec);
       Lift.resetPosition();
+      RTE = false;
       break;
     }
   }
-      waitUntil(Lift.position(deg) > 9);
   }
   return 0;
 }
@@ -482,10 +484,22 @@ void usercontrol(void) {
 // Main will set up the competition functions and callbacks.
 //
 int main() {
-  ratchet.set(0);
+  // deactivate ratchet
+  ratchet.set(1);
+
+  // reset variables and encoders
   Lift.resetPosition();
+
+  ShootButtonPressed = false;
+  WingButtonPressed = false;
+  RTE = false;
+
+  // run tasks 
+  vex::task MyTask(ShowMeInfo);
   task CataS(catastop);
   task LiftStopTask(limit_switch_lift);
+
+  // assign buttons
   Controller1.ButtonX.pressed(elevate);
   Controller1.ButtonL1.pressed(event_Catapult);
   Controller1.ButtonL2.pressed(event_Wings);
@@ -496,14 +510,11 @@ int main() {
   Controller1.ButtonDown.pressed(event_liftdown);
   Controller1.ButtonUp.pressed(event_liftup);
 
+
+  // init auton pid
   initPID(drivePID, 0.02, 0.001, 0.01, 40, 2, 10);
   initPID(turnPID, 0.08, 0.009, 0.05, 5, 2, 10);
   initPID(straightPID, 0.15, 0, 0.4, 1, -3, 3);
-
-  ShootButtonPressed = false;
-  WingButtonPressed = false;
-
-  vex::task MyTask(ShowMeInfo);
 
 
   // Run the pre-autonomous function.
