@@ -377,13 +377,13 @@ int limit_switch_lift() {
 int velocity_control_function(){
   while(true){
     
-    if(Lift.position(deg) > 300)
-    {
-      velocity_control = .6;
-    }
-    else if(Lift.position(deg) > 700)
+    if(Lift.position(deg) > 700)
     {
       velocity_control = .4;
+    }
+    else if(Lift.position(deg) > 300)
+    {
+      velocity_control = .6;
     }
     else{
       velocity_control = 1;
