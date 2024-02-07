@@ -321,8 +321,12 @@ void drive_backward(int distanceToDrive, float VelocityMin=2, float VelocityMax=
     speed = calculatePID(drivePID, degreeToDrive, currentDegree);
     yaw = DaInertial.rotation();
     correction = calculatePID(straightPID, 0, yaw);
-    LeftMotors.spin(reverse, speed - correction, volt);
-    RightMotors.spin(reverse, speed + correction, volt);
+    MotorLB.spin(reverse, speed - correction, volt);
+    MotorLF.spin(reverse, speed - correction, volt);
+    MotorRB.spin(reverse, speed + correction, volt);
+    MotorRF.spin(reverse, speed + correction, volt);
+    //LeftMotors.spin(reverse, speed - correction, volt);
+    //RightMotors.spin(reverse, speed + correction, volt);
   } while(degreeToDrive - currentDegree > 3);
 
   LeftMotors.stop(brake);
@@ -420,13 +424,70 @@ int ShowMeInfo(){
 }
 
 void auto_own(void){
- 
+  int speedMin = 3;
+  int speedMax = 7;
+  int turnSpeedMin = 2;
+  int turnSpeedMax = 6;
+  drive_backward(110, speedMin, 9);
+  wait(20, msec);  
+  turn_right(86,turnSpeedMin,turnSpeedMax);
+  outake_on();
+  wait(300, msec);
+  outake_off();
+  wait(20, msec);
+  drive_backward(3, speedMin, 5);
+  wait(20, msec);
+  turn_right(180,turnSpeedMin,turnSpeedMax);
+  wait(20, msec);
+  drive_backward(15, 6, 6);
+  wait(20, msec);
+  drive_forward(15,4,6);
+  wait(20, msec);
+  turn_left(87,turnSpeedMin,turnSpeedMax);
+  wait(20, msec);
+  drive_backward(45, speedMin, speedMax);
+  wait(20, msec);
+  turn_right(43,turnSpeedMin,turnSpeedMax);
+  wait(20, msec);
+  drive_backward(65, speedMin, speedMax);
 }
 
 
 void auto_opposite(void){
-
-
+  int speedMin = 2;
+  int speedMax = 7;
+  int turnSpeedMin = 2;
+  int turnSpeedMax = 6;
+  drive_backward(100, 4, 9);
+  wait(20, msec);
+  turn_left(87, 3, turnSpeedMax);
+  wait(20, msec);
+  outake_on();
+  wait(10,msec); 
+  drive_backward(22, 3, speedMax);
+  outake_off();
+  wait(20, msec);
+  turn_left(84, 3, turnSpeedMax);
+  wait(20, msec);
+  intake_on();
+  drive_forward(15,5,speedMax);
+  wait(20, msec);
+  drive_backward(10,5,speedMax);
+  wait(20, msec);
+  turn_right(90, 3, turnSpeedMax);
+  wait(20, msec);
+  outake_on();
+  wait(300, msec);
+  turn_right(145, turnSpeedMin, turnSpeedMax);
+  wait(20, msec);
+  intake_on();
+  drive_forward(30,5,speedMax);
+  wait(20, msec);
+  drive_backward(30,5,speedMax);
+  wait(20, msec); 
+  turn_left(145, turnSpeedMin, turnSpeedMax);
+  outake_on();
+  wait(300, msec);
 }
 
 void skills()
@@ -449,7 +510,7 @@ void autonomous(void) {
   // ..........................................................................
   // Insert autonomous user code here.
   // ..........................................................................
-  //auto_opposite();
+  auto_opposite();
   //auto_own();
   //skills();
   }
