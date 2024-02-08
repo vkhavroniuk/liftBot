@@ -198,9 +198,9 @@ void outake_off(void){
   RIntake.stop();
 }
 
-void outake_on(void){
-  LIntake.setVelocity(100, pct);
-  RIntake.setVelocity(100, pct);
+void outake_on(int spd = 100){
+  LIntake.setVelocity(spd, pct);
+  RIntake.setVelocity(spd, pct);
   LIntake.spin(reverse);
   RIntake.spin(forward);
 }
@@ -410,13 +410,13 @@ int ShowMeInfo(){
     Brain.Screen.setCursor(7,1);
     Brain.Screen.print(DaInertial.rotation(degrees)); 
     Brain.Screen.setCursor(8,1);
-    Brain.Screen.print(" Motors Left/Right/Lift");
+    Brain.Screen.print("Lift");
     Brain.Screen.setCursor(9,1);
-    Brain.Screen.print(LeftMotors.position(rotationUnits::deg)); 
+    Brain.Screen.print(Lift.position(rotationUnits::deg)); 
     Brain.Screen.setCursor(10,1);
-    Brain.Screen.print(RightMotors.position(rotationUnits::deg));
+    Brain.Screen.print(Arm.position(rotationUnits::deg));
     Brain.Screen.setCursor(11,1);
-    Brain.Screen.print(Lift.position(rotationUnits::deg));
+    Brain.Screen.print(velocity_control);
 
     wait(25, msec);
   } 
@@ -458,36 +458,46 @@ void auto_opposite(void){
   int speedMax = 7;
   int turnSpeedMin = 2;
   int turnSpeedMax = 6;
-  drive_backward(100, 4, 9);
+  drive_backward(105, 4, 9);
   wait(20, msec);
-  turn_left(87, 3, turnSpeedMax);
+  turn_left(85, 3, turnSpeedMax);
   wait(20, msec);
   outake_on();
-  wait(10,msec); 
-  drive_backward(22, 3, speedMax);
+  wait(20,msec); 
+  drive_backward(18, 3, speedMax);
   outake_off();
   wait(20, msec);
-  turn_left(84, 3, turnSpeedMax);
+ /* turn_left(84, 3, turnSpeedMax);
   wait(20, msec);
   intake_on();
-  drive_forward(15,5,speedMax);
+  drive_forward(10,5,speedMax);
   wait(20, msec);
-  drive_backward(10,5,speedMax);
+  drive_backward(5,5,speedMax);
   wait(20, msec);
-  turn_right(90, 3, turnSpeedMax);
+  turn_right(70, 3, turnSpeedMax);
   wait(20, msec);
-  outake_on();
-  wait(300, msec);
-  turn_right(145, turnSpeedMin, turnSpeedMax);
+  outake_on(60);
+  wait(300, msec); */
+  turn_right(153, turnSpeedMin, turnSpeedMax);
   wait(20, msec);
   intake_on();
   drive_forward(30,5,speedMax);
   wait(20, msec);
-  drive_backward(30,5,speedMax);
+  drive_backward(10,5,speedMax);
   wait(20, msec); 
-  turn_left(145, turnSpeedMin, turnSpeedMax);
-  outake_on();
+  turn_left(165, turnSpeedMin, turnSpeedMax);
+  outake_on(60);
   wait(300, msec);
+  turn_left(105,turnSpeedMin,turnSpeedMax);
+  intake_on();
+  wait(20, msec); 
+  drive_forward(30,speedMin,speedMax);
+  wait(20, msec); 
+  turn_right(110,speedMin,speedMax);
+  wait(20, msec);
+  outake_on(60);
+  wait(300, msec);
+  turn_left(175, turnSpeedMin, turnSpeedMax);
 }
 
 void skills()
@@ -557,8 +567,8 @@ int main() {
 
   // run tasks 
   vex::task MyTask(ShowMeInfo);
-  task CataS(catastop);
-  task LiftStopTask(limit_switch_lift);
+  vex::task CataS(catastop);
+  vex::task LiftStopTask(limit_switch_lift);
 
   // assign buttons
   Controller1.ButtonX.pressed(elevate);
