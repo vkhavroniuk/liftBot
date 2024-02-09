@@ -144,7 +144,9 @@ void elevate(void){
   else if(RTE){
     ratchet.set(0);
     Lift.setBrake(hold);
-    Lift.spinTo(240,deg,true);
+      Lift.setVelocity(70.0, percent);
+
+    Lift.spinTo(420,deg,true);
     RTE = false;
   }
 }
@@ -459,7 +461,7 @@ void auto_opposite(void){
   int turnSpeedMin = 2;
   int turnSpeedMax = 6;
   drive_backward(105, 4, 9);
-  wait(20, msec);
+  /*wait(20, msec);
   turn_left(85, 3, turnSpeedMax);
   wait(20, msec);
   outake_on();
@@ -467,7 +469,7 @@ void auto_opposite(void){
   drive_backward(18, 3, speedMax);
   outake_off();
   wait(20, msec);
- /* turn_left(84, 3, turnSpeedMax);
+  turn_left(84, 3, turnSpeedMax);
   wait(20, msec);
   intake_on();
   drive_forward(10,5,speedMax);
@@ -477,7 +479,7 @@ void auto_opposite(void){
   turn_right(70, 3, turnSpeedMax);
   wait(20, msec);
   outake_on(60);
-  wait(300, msec); */
+  wait(300, msec); 
   turn_right(153, turnSpeedMin, turnSpeedMax);
   wait(20, msec);
   intake_on();
@@ -497,7 +499,7 @@ void auto_opposite(void){
   wait(20, msec);
   outake_on(60);
   wait(300, msec);
-  turn_left(175, turnSpeedMin, turnSpeedMax);
+  turn_left(175, turnSpeedMin, turnSpeedMax);*/
 }
 
 void skills()
