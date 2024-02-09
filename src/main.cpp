@@ -460,46 +460,49 @@ void auto_opposite(void){
   int speedMax = 7;
   int turnSpeedMin = 2;
   int turnSpeedMax = 6;
-  drive_backward(105, 4, 9);
-  /*wait(20, msec);
-  turn_left(85, 3, turnSpeedMax);
+  // driving to the goal
+  drive_backward(103, 4, 7);
   wait(20, msec);
+  turn_left(86, 3, turnSpeedMax);
+  wait(20, msec);
+  //spitting out triball
   outake_on();
   wait(20,msec); 
-  drive_backward(18, 3, speedMax);
+  //getting second triball
+  drive_backward(35, 3, speedMax);
   outake_off();
   wait(20, msec);
-  turn_left(84, 3, turnSpeedMax);
+  turn_right(143, 3, turnSpeedMax);
   wait(20, msec);
   intake_on();
-  drive_forward(10,5,speedMax);
+  drive_forward(11,5,speedMax);
   wait(20, msec);
-  drive_backward(5,5,speedMax);
+  drive_backward(11,5,speedMax);
   wait(20, msec);
-  turn_right(70, 3, turnSpeedMax);
+  turn_left(155, 3, turnSpeedMax);
   wait(20, msec);
-  outake_on(60);
+  outake_on(70);
   wait(300, msec); 
-  turn_right(153, turnSpeedMin, turnSpeedMax);
+  turn_left(117, turnSpeedMin, turnSpeedMax);
   wait(20, msec);
   intake_on();
-  drive_forward(30,5,speedMax);
+  drive_forward(20,5,speedMax);
   wait(20, msec);
   drive_backward(10,5,speedMax);
   wait(20, msec); 
-  turn_left(165, turnSpeedMin, turnSpeedMax);
-  outake_on(60);
+  turn_right(115, turnSpeedMin, turnSpeedMax);
+  outake_on(70);
   wait(300, msec);
-  turn_left(105,turnSpeedMin,turnSpeedMax);
-  intake_on();
+  turn_left(110,turnSpeedMin,turnSpeedMax);
   wait(20, msec); 
-  drive_forward(30,speedMin,speedMax);
+  outake_off();
+  drive_forward(10,speedMin,speedMax);
   wait(20, msec); 
-  turn_right(110,speedMin,speedMax);
+  turn_left(48,speedMin,speedMax); 
   wait(20, msec);
-  outake_on(60);
-  wait(300, msec);
-  turn_left(175, turnSpeedMin, turnSpeedMax);*/
+  event_Wings();
+  wait(20, msec);
+  drive_backward(75,6,speedMax);
 }
 
 void skills()
