@@ -26,7 +26,7 @@ motor Shooter = motor(PORT4, ratio36_1, true);
 
 motor LIntake = motor(PORT1, ratio18_1, false);
 motor RIntake = motor(PORT2, ratio18_1, false);
-motor Arm = motor(PORT8, ratio36_1, false);
+motor Arm = motor(PORT16, ratio36_1, false);
 motor Lift = motor(PORT3, ratio36_1, false);
 inertial DaInertial = inertial(PORT10);
 
@@ -225,6 +225,21 @@ void event_Outake(void){
   waitUntil((!Controller1.ButtonR2.pressing()));
   outake_off();
 }
+void Arm_Move(void){
+  Arm.setVelocity(80, pct);
+  Arm.setMaxTorque(100, pct);
+  Arm.setBrake(hold);//coast before
+  Arm.spinToPosition(195, deg, true);//was 175
+  Arm.stop();
+}
+
+void Arm_Move_back(void){
+  Arm.setVelocity(80, pct);
+  Arm.setMaxTorque(100, pct);
+  Arm.setBrake(coast);
+  Arm.spinToPosition(20, deg, true);
+  Arm.stop();
+}
 
 void event_Arm(void){
     if (!isArmOpen()) {
@@ -354,6 +369,7 @@ void drive_backward(int distanceToDrive, float VelocityMin=2, float VelocityMax=
 void pre_auton(void) {
   // All activities that occur before the competition starts
   // Example: clearing encoders, setting servo positions, ...
+  
   DaInertial.calibrate();
   Brain.Screen.print("Calibrating Inertial Sensor");
   while (DaInertial.isCalibrating())
@@ -430,7 +446,7 @@ void auto_own(void){
   int speedMax = 7;
   int turnSpeedMin = 2;
   int turnSpeedMax = 6;
-  drive_backward(110, speedMin, 9);
+  drive_backward(105, speedMin, 9);
   wait(20, msec);  
   turn_right(86,turnSpeedMin,turnSpeedMax);
   outake_on();
@@ -443,7 +459,7 @@ void auto_own(void){
   wait(20, msec);
   drive_backward(15, 6, 6);
   wait(20, msec);
-  drive_forward(15,4,6);
+  drive_forward(12,4,6);
   wait(20, msec);
   turn_left(87,turnSpeedMin,turnSpeedMax);
   wait(20, msec);
@@ -451,7 +467,15 @@ void auto_own(void){
   wait(20, msec);
   turn_right(43,turnSpeedMin,turnSpeedMax);
   wait(20, msec);
-  drive_backward(65, speedMin, speedMax);
+  drive_backward(67, speedMin, speedMax);
+  wait(20, msec);
+  Arm_Move();
+  wait(40, msec);
+  drive_forward(25,4,7);
+  wait(20, msec);
+  turn_left(90,turnSpeedMin,turnSpeedMax);
+  wait(40, msec);
+  Arm_Move_back();
 }
 
 
@@ -461,38 +485,42 @@ void auto_opposite(void){
   int turnSpeedMin = 2;
   int turnSpeedMax = 6;
   // driving to the goal
-  drive_backward(103, 4, 7);
+  drive_backward(101, 4, 7);//was 103
   wait(20, msec);
   turn_left(86, 3, turnSpeedMax);
   wait(20, msec);
   //spitting out triball
   outake_on();
   wait(20,msec); 
-  //getting second triball
+  //getting first triball
   drive_backward(35, 3, speedMax);
   outake_off();
   wait(20, msec);
   turn_right(143, 3, turnSpeedMax);
   wait(20, msec);
   intake_on();
-  drive_forward(11,5,speedMax);
-  wait(20, msec);
-  drive_backward(11,5,speedMax);
+  drive_forward(10,5,speedMax);
+  wait(40, msec);
+  //getting second triball
+
+  drive_backward(10,3,speedMax);
   wait(20, msec);
   turn_left(155, 3, turnSpeedMax);
   wait(20, msec);
   outake_on(70);
   wait(300, msec); 
-  turn_left(117, turnSpeedMin, turnSpeedMax);
+  //getting third triball
+  turn_left(120, turnSpeedMin, turnSpeedMax);
   wait(20, msec);
   intake_on();
   drive_forward(20,5,speedMax);
   wait(20, msec);
-  drive_backward(10,5,speedMax);
+  drive_backward(13,5,speedMax);
   wait(20, msec); 
   turn_right(115, turnSpeedMin, turnSpeedMax);
   outake_on(70);
   wait(300, msec);
+  //scoring
   turn_left(110,turnSpeedMin,turnSpeedMax);
   wait(20, msec); 
   outake_off();
@@ -502,7 +530,7 @@ void auto_opposite(void){
   wait(20, msec);
   event_Wings();
   wait(20, msec);
-  drive_backward(75,6,speedMax);
+  drive_backward(75,7,9);
 }
 
 void skills()
@@ -525,9 +553,11 @@ void autonomous(void) {
   // ..........................................................................
   // Insert autonomous user code here.
   // ..........................................................................
-  auto_opposite();
-  //auto_own();
+  vex::task CataS(catastop);
+  //auto_opposite();
+  auto_own();
   //skills();
+  //opposite doesn't have arm
   }
 
 
@@ -565,6 +595,7 @@ int main() {
 
   // reset variables and encoders
   Lift.resetPosition();
+  Arm.resetPosition();
 
   ShootButtonPressed = false;
   WingButtonPressed = false;
@@ -572,7 +603,7 @@ int main() {
 
   // run tasks 
   vex::task MyTask(ShowMeInfo);
-  vex::task CataS(catastop);
+  //vex::task CataS(catastop);
   vex::task LiftStopTask(limit_switch_lift);
 
   // assign buttons
