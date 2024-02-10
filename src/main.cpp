@@ -229,7 +229,7 @@ void Arm_Move(void){
   Arm.setVelocity(80, pct);
   Arm.setMaxTorque(100, pct);
   Arm.setBrake(hold);//coast before
-  Arm.spinToPosition(195, deg, true);//was 175
+  Arm.spinToPosition(185, deg, true);//was 175
   Arm.stop();
 }
 
@@ -451,31 +451,34 @@ void auto_own(void){
   turn_right(86,turnSpeedMin,turnSpeedMax);
   outake_on();
   wait(300, msec);
+  drive_forward(3, 5, 5);
   outake_off();
   wait(20, msec);
-  drive_backward(3, speedMin, 5);
+  drive_backward(5, 6, 6);
   wait(20, msec);
-  turn_right(180,turnSpeedMin,turnSpeedMax);
+  turn_right(90,turnSpeedMin,turnSpeedMax);
   wait(20, msec);
-  drive_backward(15, 6, 6);
+  drive_backward(47, speedMin, speedMax);
   wait(20, msec);
-  drive_forward(12,4,6);
+  turn_right(45,turnSpeedMin,turnSpeedMax);
   wait(20, msec);
-  turn_left(87,turnSpeedMin,turnSpeedMax);
-  wait(20, msec);
-  drive_backward(45, speedMin, speedMax);
-  wait(20, msec);
-  turn_right(43,turnSpeedMin,turnSpeedMax);
-  wait(20, msec);
-  drive_backward(67, speedMin, speedMax);
+  drive_backward(64, speedMin, speedMax);
+
+    
   wait(20, msec);
   Arm_Move();
   wait(40, msec);
   drive_forward(25,4,7);
   wait(20, msec);
-  turn_left(90,turnSpeedMin,turnSpeedMax);
+  turn_left(90,5,7);
   wait(40, msec);
   Arm_Move_back();
+  wait(20, msec);
+  drive_backward(40, 3, 7);
+  turn_left(47,turnSpeedMin,turnSpeedMax);
+  Arm.setBrake(hold);
+  Arm.spinToPosition(90, deg, false);
+  drive_backward(40,5,7);
 }
 
 
