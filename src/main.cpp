@@ -478,7 +478,9 @@ void auto_own(void){
   turn_left(47,turnSpeedMin,turnSpeedMax);
   Arm.setBrake(hold);
   Arm.spinToPosition(90, deg, false);
-  drive_backward(40,5,7);
+  drive_backward(45,5,7);
+  wait(20, msec);
+  drive_forward(3,4,7);
 }
 
 
