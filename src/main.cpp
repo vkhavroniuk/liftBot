@@ -142,12 +142,11 @@ void elevate(void){
     RTE = true;
   }
   else if(RTE){
-    ratchet.set(0);
     Lift.setBrake(hold);
-      Lift.setVelocity(70.0, percent);
-
+    Lift.setVelocity(70.0, percent);
     Lift.spinTo(420,deg,true);
     RTE = false;
+    ratchet.set(0);
   }
 }
 
@@ -242,16 +241,16 @@ void Arm_Move_back(void){
 }
 
 void event_Arm(void){
-    if (!isArmOpen()) {
+    if (!isArmOpen() && Lift.position(deg) < 30) {
       Arm.setStopping(coast);
-    	Arm.setVelocity(70.0, percent);
-      Arm.spinTo(75,deg, true); //was 170
+    	Arm.setVelocity(40.0, percent);
+      Arm.spinTo(90,deg, true); //was 170
       Arm.stop(hold);
     }
-    else {
-      Arm.setVelocity(70.0, percent);
+    else if (Lift.position(deg) < 30) {
+      Arm.setVelocity(20.0, percent);
       Arm.setStopping(coast);
-      Arm.spinTo(30,deg,true);
+      Arm.spinTo(20,deg,true);
       Arm.stop();
     }
 }
@@ -367,9 +366,6 @@ void drive_backward(int distanceToDrive, float VelocityMin=2, float VelocityMax=
 /*---------------------------------------------------------------------------*/
 
 void pre_auton(void) {
-  // All activities that occur before the competition starts
-  // Example: clearing encoders, setting servo positions, ...
-  
   DaInertial.calibrate();
   Brain.Screen.print("Calibrating Inertial Sensor");
   while (DaInertial.isCalibrating())
@@ -462,9 +458,7 @@ void auto_own(void){
   wait(20, msec);
   turn_right(45,turnSpeedMin,turnSpeedMax);
   wait(20, msec);
-  drive_backward(64, speedMin, speedMax);
-
-    
+  drive_backward(64, speedMin, speedMax);   
   wait(20, msec);
   Arm_Move();
   wait(40, msec);
@@ -558,7 +552,6 @@ void autonomous(void) {
   // ..........................................................................
   // Insert autonomous user code here.
   // ..........................................................................
-  vex::task CataS(catastop);
   //auto_opposite();
   auto_own();
   //skills();
@@ -579,7 +572,7 @@ void autonomous(void) {
 void usercontrol(void) {
   wait(15, msec);
   // User control code here, inside the loop
-  
+  vex::task CataS(catastop);
   task VelocityController(velocity_control_function);
   while (1) {
     RightMotors.setVelocity((Controller1.Axis3.position() - Controller1.Axis1.position()) * velocity_control, percent);
