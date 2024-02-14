@@ -49,6 +49,10 @@ float velocity_control = 1;
 PID drivePID;
 PID turnPID;
 PID straightPID;
+PID turnAbsolutePID;
+
+enum TurnDirection { left, right };
+
   // 1 revolution = ~26cm
   // 60/36 Gear Ratio
   // One Rev is 360 degrees and 25.9207*(60/36) = 43.20cm
@@ -365,6 +369,56 @@ void drive_backward(int distanceToDrive, float VelocityMin=2, float VelocityMax=
   resetPID(straightPID);
 }
 
+
+// added absolute turn with direction enum
+
+void turn(float DegreesToTurn, TurnDirection direction) {
+  float speed;
+  float currentDegrees;
+  DaInertial.resetRotation();
+  setPIDmin(turnPID, 1);
+  setPIDmax(turnPID, 7);
+
+  do {
+    wait(20, msec);
+    currentDegrees = fabs(DaInertial.heading());
+    speed = calculatePID(turnPID, DegreesToTurn, currentDegrees);
+    if (direction == left) {
+      RightMotors.spin(forward, speed, volt);
+      LeftMotors.spin(reverse, speed, volt);
+    } else {
+      RightMotors.spin(reverse, speed, volt);
+      LeftMotors.spin(forward, speed, volt);      
+    }
+
+  } while(currentDegrees != DegreesToTurn);
+  RightMotors.stop(brake);
+  LeftMotors.stop(brake);
+  resetPID(turnPID);
+  wait(20, msec);
+}
+
+// added absolute turn 
+void turn_to(float dest_degree) {
+  float current_position = DaInertial.heading();
+  float turn_angle = dest_degree - current_position;
+
+  if (turn_angle > 0); {
+    if (turn_angle <=180) {
+      turn(dest_degree, right);
+    } else if (turn_angle > 180) {
+      turn(dest_degree, left);
+    }
+  } else {
+    turn_angle = 360 - dest_degree + current_position
+    if (turn_angle < 180) {
+      turn(dest_degree, left);
+    } else if (turn_angle > 180) {
+      turn(dest_degree, right);
+    }
+  }
+
+}
 
 void parking(void)
 {
@@ -695,6 +749,7 @@ int main() {
   initPID(turnPID, 0.08, 0.009, 0.05, 5, 2, 10);
   initPID(straightPID, 0.15, 0, 0.4, 1, -3, 3);
 
+  initPID(turnAbsolutePID, 0.08, 0.009, 0.05, 5, 2, 10);
 
   // Run the pre-autonomous function.
   pre_auton();
