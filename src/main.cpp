@@ -51,7 +51,7 @@ PID turnPID;
 PID straightPID;
 PID turnAbsolutePID;
 
-enum TurnDirection { left, right };
+enum TurnDirection { left_turn, right_turn };
 
   // 1 revolution = ~26cm
   // 60/36 Gear Ratio
@@ -375,7 +375,6 @@ void drive_backward(int distanceToDrive, float VelocityMin=2, float VelocityMax=
 void turn(float DegreesToTurn, TurnDirection direction) {
   float speed;
   float currentDegrees;
-  DaInertial.resetRotation();
   setPIDmin(turnPID, 1);
   setPIDmax(turnPID, 7);
 
@@ -383,7 +382,7 @@ void turn(float DegreesToTurn, TurnDirection direction) {
     wait(20, msec);
     currentDegrees = fabs(DaInertial.heading());
     speed = calculatePID(turnPID, DegreesToTurn, currentDegrees);
-    if (direction == left) {
+    if (direction == left_turn) {
       RightMotors.spin(forward, speed, volt);
       LeftMotors.spin(reverse, speed, volt);
     } else {
@@ -403,18 +402,18 @@ void turn_to(float dest_degree) {
   float current_position = DaInertial.heading();
   float turn_angle = dest_degree - current_position;
 
-  if (turn_angle > 0); {
+  if (turn_angle > 0) {
     if (turn_angle <=180) {
-      turn(dest_degree, right);
+      turn(dest_degree, right_turn);
     } else if (turn_angle > 180) {
-      turn(dest_degree, left);
+      turn(dest_degree, left_turn);
     }
   } else {
-    turn_angle = 360 - dest_degree + current_position
+    turn_angle = 360 - dest_degree + current_position;
     if (turn_angle < 180) {
-      turn(dest_degree, left);
+      turn(dest_degree, left_turn);
     } else if (turn_angle > 180) {
-      turn(dest_degree, right);
+      turn(dest_degree, right_turn);
     }
   }
 
