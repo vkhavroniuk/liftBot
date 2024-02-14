@@ -94,11 +94,11 @@ bool LiftInRange(void){
 
 
 void push(int time){
- LeftMotors.setVelocity(65,pct);
- RightMotors.setVelocity(65,pct);
+ LeftMotors.setVelocity(70,pct);
+ RightMotors.setVelocity(70,pct);
  RightMotors.spin(reverse);
  LeftMotors.spin(reverse);
- wait(time,sec);
+ wait(time,msec);
  LeftMotors.stop();
  RightMotors.stop();
 }
@@ -131,6 +131,17 @@ void event_RightWing(void){
   else
   {
     rightWing.set(false);
+  }
+}
+
+void event_LeftWing(void){
+  if(!isLeftWOpen())
+  {
+    leftWing.set(true);
+  }
+  else
+  {
+    leftWing.set(false);
   }
 }
 
@@ -174,7 +185,7 @@ void event_liftup(void){
 
 void event_Catapult(void){
       if (!ShootButtonPressed) {
-        Shooter.setVelocity(80.0, percent);
+        Shooter.setVelocity(90.0, percent);//was 80
         MotorLB.setBrake(hold);
         MotorLF.setBrake(hold);
         MotorRF.setBrake(hold);
@@ -243,17 +254,20 @@ void Arm_Move_back(void){
 void event_Arm(void){
     if (!isArmOpen() && Lift.position(deg) < 30) {
       Arm.setStopping(coast);
-    	Arm.setVelocity(40.0, percent);
-      Arm.spinTo(90,deg, true); //was 170
+    	Arm.setVelocity(50.0, percent);
+      Arm.setMaxTorque(100,pct);
+      Arm.spinTo(150,deg, true); //was 170
       Arm.stop(hold);
     }
     else if (Lift.position(deg) < 30) {
-      Arm.setVelocity(20.0, percent);
+      Arm.setVelocity(50.0, percent);
       Arm.setStopping(coast);
       Arm.spinTo(20,deg,true);
       Arm.stop();
     }
 }
+
+
 
 
 void turn_right(int DegreesToTurn, float VelocityMin=2, float VelocityMax=12) {
@@ -352,7 +366,16 @@ void drive_backward(int distanceToDrive, float VelocityMin=2, float VelocityMax=
 }
 
 
-
+void parking(void)
+{
+  drive_backward(50,4,7);
+  wait(20,msec);
+  turn_left(50,4,7);
+  wait(20,msec);
+  drive_backward(2,4,5);
+  wait(20,msec);
+  event_RightWing();
+}
 
 
 /*---------------------------------------------------------------------------*/
@@ -534,8 +557,58 @@ void auto_opposite(void){
 
 void skills()
 {
-
-
+  parking();
+  //event_Catapult();
+  wait(3000, msec);
+  //event_Catapult();
+  vex::task CataS(catastop);
+  wait(1000, msec);
+  event_RightWing();
+  wait(20, msec);
+  drive_forward(3,4,5);
+  wait(20, msec);
+  turn_right(50,4,7);
+  wait(20, msec);
+  drive_forward(45,5,7);
+  wait(20, msec);
+  turn_left(33,3,7);
+  wait(20, msec);
+  drive_forward(200,5,7);
+  wait(20, msec);
+  turn_right(50,4,7);
+  event_LeftWing();
+  wait(20, msec);
+  drive_backward(80,5,7);
+  wait(20, msec);
+  event_LeftWing();
+  wait(20, msec);
+  drive_backward(20,5,7);//was 35
+  wait(20, msec);
+  turn_right(100,4,7);
+  wait(20, msec);
+  event_Wings();
+  wait(20, msec);
+  push(1500);
+  wait(20, msec);
+  event_Wings();
+  wait(20, msec);
+  drive_forward(70,5,7);
+  wait(20, msec);
+  turn_right(90,4,7);
+  wait(20, msec);
+  drive_forward(65,5,7);//was 70
+  wait(20, msec);
+  turn_left(45,3,7);
+  wait(20, msec);
+  event_Wings();
+  push(1500);
+  /*
+  /drive_forward(5,5,7);
+  wait(20, msec);
+  turn_right(15,4,7);
+  wait(20, msec);
+  drive_forward(50,5,7);
+  */
 }
 
 /*---------------------------------------------------------------------------*/
@@ -553,8 +626,8 @@ void autonomous(void) {
   // Insert autonomous user code here.
   // ..........................................................................
   //auto_opposite();
-  auto_own();
-  //skills();
+  //auto_own();
+  skills();
   //opposite doesn't have arm
   }
 
@@ -605,6 +678,7 @@ int main() {
   vex::task LiftStopTask(limit_switch_lift);
 
   // assign buttons
+  Controller1.ButtonY.pressed(parking);
   Controller1.ButtonX.pressed(elevate);
   Controller1.ButtonL1.pressed(event_Catapult);
   Controller1.ButtonL2.pressed(event_Wings);

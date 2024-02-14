@@ -4,12 +4,12 @@
 		"json": 2
 	},
 	"project": {
-		"name": "OWN",
+		"name": "Flip",
 		"description": "",
 		"creationDate": "9/19/2023, 6:22:50 PM",
 		"platform": "V5",
 		"language": "cpp",
-		"slot": 1,
+		"slot": 3,
 		"sdkVersion": "V5_20220726_10_00_00",
 		"cpp": {
 			"includePath": [],
