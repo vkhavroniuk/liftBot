@@ -389,8 +389,8 @@ void turn(float DegreesToTurn, TurnDirection direction) {
       RightMotors.spin(reverse, speed, volt);
       LeftMotors.spin(forward, speed, volt);      
     }
-
-  } while(currentDegrees != DegreesToTurn);
+    
+  } while(turnPID.error <= 1); 
   RightMotors.stop(brake);
   LeftMotors.stop(brake);
   resetPID(turnPID);

@@ -7,12 +7,14 @@ void initPID(PID &pid,double Kp, double Ki, double Kd, double limitIntegral, dou
     pid.limitIntegral = limitIntegral;
     pid.minOutput = minOutput;
     pid.maxOutput = maxOutput;
+    pid.error = 0;
     pid.prevError = 0;
     pid.firstRun = true;
 }
 
 void resetPID(PID &pid){
     pid.prevError = 0;
+    pid.error = 0;
     pid.firstRun = true;
 }
 
@@ -25,30 +27,30 @@ void setPIDmin(PID &pid, double minOutput){
 }
 
 double calculatePID(PID &pid, double destination, double current){
-    double error;
     double totalGain = 0;
     double proportionalGain = 0;
     double integralGain = 0;
     double derivativeGain = 0;
 
-    error = destination - current;
-    proportionalGain = pid.Kp * error;
+    pid.error = destination - current;
+     
+    proportionalGain = pid.Kp * pid.error;
     
     if (pid.firstRun) {
-       pid.prevError = error;
+       pid.prevError = pid.error;
        pid.firstRun = false;
     }
 
-    if(error < pid.limitIntegral){
-        pid.integral = pid.integral + error;
+    if(pid.error < pid.limitIntegral){
+        pid.integral = pid.integral + pid.error;
     }
     else{
         pid.integral = 0;
     }
     integralGain = pid.Ki * pid.integral;
     
-    derivativeGain = (error - pid.prevError) * pid.Kd;
-    pid.prevError = error;
+    derivativeGain = (pid.error - pid.prevError) * pid.Kd;
+    pid.prevError = pid.error;
 
     totalGain = proportionalGain + integralGain + derivativeGain;
     

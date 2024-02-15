@@ -3,6 +3,7 @@ struct PID{
     double Ki;
     double Kd;
     double integral;
+    double error;
     double prevError;
     double limitIntegral;
     double maxOutput;
